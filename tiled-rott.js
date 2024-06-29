@@ -132,7 +132,7 @@ function rottRead(fileName) {
 	}
 
 	// choose map to load
-	const mapNumStr = tiled.prompt("Enter map number", "0", "Load ROTT Map (0-99)");
+	const mapNumStr = tiled.prompt("Enter map number (0-99)", "0", "Load ROTT Map (0-99)");
 	const mapNum = parseInt(mapNumStr, 10);
 	if (mapNum < 0 || mapNum >= 100) {
 		throw new Error("Invalid map number");
@@ -173,6 +173,11 @@ function rottRead(fileName) {
 	wallsTileSet.image = "ext:rott_walls.png";
 	tm.addTileset(wallsTileSet);
 
+	const spritesTileSet = new Tileset("rott_sprites");
+	spritesTileSet.setTileSize(16, 16);
+	spritesTileSet.image = "ext:rott_sprites.png";
+	tm.addTileset(spritesTileSet);
+
 	// create layers
 	const wallsLayer = new TileLayer("walls");
 	wallsLayer.width = 128;
@@ -191,8 +196,8 @@ function rottRead(fileName) {
 
 	// decode layers
 	rottDecodePlane(mapBuffer, mapPlaneOffsets[0], mapPlaneSizes[0], mapTag, wallsEdit, wallsTileSet);
-	rottDecodePlane(mapBuffer, mapPlaneOffsets[1], mapPlaneSizes[1], mapTag, spritesEdit);
-	rottDecodePlane(mapBuffer, mapPlaneOffsets[2], mapPlaneSizes[2], mapTag, infosEdit);
+	rottDecodePlane(mapBuffer, mapPlaneOffsets[1], mapPlaneSizes[1], mapTag, spritesEdit, spritesTileSet);
+	// rottDecodePlane(mapBuffer, mapPlaneOffsets[2], mapPlaneSizes[2], mapTag, infosEdit);
 
 	wallsEdit.apply();
 	spritesEdit.apply();
