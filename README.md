@@ -1,3 +1,11 @@
+# tiled-rott
+
+A plugin for Tiled that lets you import levels from Rise of the Triad.
+
+![](./.github/screenshot.png)
+
+## License
+
 MIT License
 
 Copyright (c) 2024 erysdren (it/she/they)
