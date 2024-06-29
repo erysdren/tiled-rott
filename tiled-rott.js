@@ -213,16 +213,10 @@ function rottRead(fileName) {
 	return tm;
 }
 
-function rottWrite(map, fileName) {
-	console.warn("rottWrite() is not yet implemented.");
-	return undefined;
-}
-
 const rottFormat = {
 	name: "Rise of the Triad",
 	extension: "rtl",
-	read: rottRead,
-	write: rottWrite
+	read: rottRead
 };
 
 tiled.registerMapFormat("rott", rottFormat);
