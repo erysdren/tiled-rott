@@ -167,6 +167,10 @@ function rottRead(fileName) {
 	tm.setTileSize(16, 16);
 	tm.orientation = TileMap.Orthogonal;
 
+	// add custom properties
+	tm.setProperty("Map Name", mapName);
+	tm.setProperty("Map Index", Math.floor(mapNum));
+
 	// create tilesets
 	const wallsTileSet = new Tileset("rott_walls");
 	wallsTileSet.setTileSize(16, 16);
