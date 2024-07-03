@@ -55,7 +55,7 @@ function bytesToString(arr, length) {
 	return String.fromCharCode(...chars);
 }
 
-function rottDecodePlane(buffer, offset, size, tag, tileEditLayer, tileSet) {
+function rottDecodePlane(buffer, offset, size, tag, tileLayer, tileSet) {
 
 	// seek to pos
 	buffer.seek(offset);
@@ -95,12 +95,27 @@ function rottDecodePlane(buffer, offset, size, tag, tileEditLayer, tileSet) {
 	}
 
 	// write map data
-	for (let y = 0; y < 128; y++) {
-		for (let x = 0; x < 128; x++) {
-			if (decompressed[y * 128 + x] > 0) {
-				tileEditLayer.setTile(x, y, tileSet.tiles[decompressed[y * 128 + x]]);
+	if (tileLayer.isObjectLayer) {
+		for (let y = 0; y < 128; y++) {
+			for (let x = 0; x < 128; x++) {
+				if (decompressed[y * 128 + x] > 0) {
+					obj = new MapObject(MapObject.Point, decompressed[y * 128 + x].toString(10))
+					obj.pos.x = (x * 16) + 8;
+					obj.pos.y = (y * 16) + 8;
+					tileLayer.addObject(obj);
+				}
 			}
 		}
+	} else {
+		tileEditLayer = tileLayer.edit()
+		for (let y = 0; y < 128; y++) {
+			for (let x = 0; x < 128; x++) {
+				if (decompressed[y * 128 + x] > 0) {
+					tileEditLayer.setTile(x, y, tileSet.tiles[decompressed[y * 128 + x]]);
+				}
+			}
+		}
+		tileEditLayer.apply()
 	}
 }
 
@@ -182,30 +197,26 @@ function rottRead(fileName) {
 	spritesTileSet.image = "ext:rott_sprites.png";
 	tm.addTileset(spritesTileSet);
 
-	// create layers
+	// walls layer
 	const wallsLayer = new TileLayer("walls");
 	wallsLayer.width = 128;
 	wallsLayer.height = 128;
-	const wallsEdit = wallsLayer.edit();
 
+	// sprites layer
 	const spritesLayer = new TileLayer("sprites");
 	spritesLayer.width = 128;
 	spritesLayer.height = 128;
-	const spritesEdit = spritesLayer.edit();
 
+	// info tiles layer
 	const infosLayer = new TileLayer("infos");
 	infosLayer.width = 128;
 	infosLayer.height = 128;
-	const infosEdit = infosLayer.edit();
 
 	// decode layers
-	rottDecodePlane(mapBuffer, mapPlaneOffsets[0], mapPlaneSizes[0], mapTag, wallsEdit, wallsTileSet);
-	rottDecodePlane(mapBuffer, mapPlaneOffsets[1], mapPlaneSizes[1], mapTag, spritesEdit, spritesTileSet);
-	// rottDecodePlane(mapBuffer, mapPlaneOffsets[2], mapPlaneSizes[2], mapTag, infosEdit);
+	rottDecodePlane(mapBuffer, mapPlaneOffsets[0], mapPlaneSizes[0], mapTag, wallsLayer, wallsTileSet);
+	rottDecodePlane(mapBuffer, mapPlaneOffsets[1], mapPlaneSizes[1], mapTag, spritesLayer, spritesTileSet);
+	// rottDecodePlane(mapBuffer, mapPlaneOffsets[2], mapPlaneSizes[2], mapTag, infosLayer, spritesTileSet);
 
-	wallsEdit.apply();
-	spritesEdit.apply();
-	infosEdit.apply();
 	tm.addLayer(wallsLayer);
 	tm.addLayer(spritesLayer);
 	tm.addLayer(infosLayer);
